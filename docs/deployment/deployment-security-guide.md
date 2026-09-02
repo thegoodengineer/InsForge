@@ -1018,17 +1018,20 @@ RETENTION_DAYS=30 ./deploy/backup.sh
 BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-Restore a database dump (adjust path if `BACKUP_DIR` was changed):
+Restore a database dump:
 
 ```bash
 cd ~/insforge
 set -a && source .env && set +a
-cat backups/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
 ```
 
 #### 17.2 Schedule with Cron
 
+Ensure the backup directory exists, then edit the crontab:
+
 ```bash
+mkdir -p ~/insforge/backups
 crontab -e
 ```
 

@@ -1009,17 +1009,20 @@ RETENTION_DAYS=30 ./deploy/backup.sh
 BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-Restaura un volcado de base de datos (ajusta la ruta si se cambió `BACKUP_DIR`):
+Restaura un volcado de base de datos:
 
 ```bash
 cd ~/insforge
 set -a && source .env && set +a
-cat backups/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
 ```
 
 #### 17.2 Programa con Cron
 
+Asegúrate de que el directorio de copias de seguridad exista, luego edita el crontab:
+
 ```bash
+mkdir -p ~/insforge/backups
 crontab -e
 ```
 

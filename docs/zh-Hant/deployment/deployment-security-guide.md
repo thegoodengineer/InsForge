@@ -1007,17 +1007,20 @@ RETENTION_DAYS=30 ./deploy/backup.sh
 BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-復原資料庫傾印（若變更了 `BACKUP_DIR`，請調整路徑）：
+復原資料庫傾印：
 
 ```bash
 cd ~/insforge
 set -a && source .env && set +a
-cat backups/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
 ```
 
 #### 17.2 使用 Cron 排程
 
+確保備份目錄存在，然後編輯 crontab：
+
 ```bash
+mkdir -p ~/insforge/backups
 crontab -e
 ```
 

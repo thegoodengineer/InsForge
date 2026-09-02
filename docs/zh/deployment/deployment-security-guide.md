@@ -1006,17 +1006,20 @@ RETENTION_DAYS=30 ./deploy/backup.sh
 BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-恢复数据库转储（如果更改了 `BACKUP_DIR`，请调整路径）：
+恢复数据库转储：
 
 ```bash
 cd ~/insforge
 set -a && source .env && set +a
-cat backups/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
+cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
 ```
 
 #### 17.2 使用 Cron 设置计划任务
 
+确保备份目录存在，然后编辑 crontab：
+
 ```bash
+mkdir -p ~/insforge/backups
 crontab -e
 ```
 
