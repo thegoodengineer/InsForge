@@ -824,6 +824,15 @@ Por defecto, el backend permite todos los orígenes. Refleja el encabezado `Orig
 
 #### 14.1 Haz una copia de seguridad de la base de datos
 
+Para un volcado de base de datos y copia de `.env` en un solo paso, utiliza el script de copia de seguridad incluido:
+
+```bash
+cd ~/insforge
+./deploy/backup.sh
+```
+
+O realiza el volcado manualmente:
+
 ```bash
 cd ~/insforge
 source .env
@@ -982,51 +991,29 @@ docker compose up -d
 
 ### 17. Copias de seguridad automatizadas
 
-Configura una tarea cron para copias de seguridad automáticas diarias:
+Configura una tarea cron para copias de seguridad automáticas diarias.
 
-#### 17.1 Crea un script de copia de seguridad
+#### 17.1 Ejecuta el script de copia de seguridad
+
+Las instalaciones autohospedadas incluyen `deploy/backup.sh` (entregado por `deploy/setup.sh`). Vuelca Postgres y copia `.env` en un directorio `backups/` en la raíz de tu instalación.
 
 ```bash
-nano ~/insforge/backup.sh
+cd ~/insforge
+./deploy/backup.sh
 ```
 
+De forma predeterminada, las copias de seguridad se guardan en `~/insforge/backups/` y se eliminan los archivos con más de 14 días. Sobrescribe la retención:
+
 ```bash
-#!/bin/bash
-set -euo pipefail
-
-# InsForge Automated Backup Script
-# Run from the checkout so docker compose reads COMPOSE_FILE and
-# COMPOSE_PROJECT_NAME from .env, which also carries POSTGRES_USER / POSTGRES_DB
-cd "$HOME/insforge"
-set -a
-source .env
-set +a
-
-BACKUP_DIR="$HOME/insforge/backups"
-RETENTION_DAYS=14
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
-trap 'echo "[$(date)] ERROR: Backup failed at line $LINENO" >&2; exit 1' ERR
-
-mkdir -p "$BACKUP_DIR"
-
-# Dump the database
-docker compose exec -T postgres \
-  pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" \
-  > "$BACKUP_DIR/db_$TIMESTAMP.sql"
-
-# Copy the environment file
-cp "$HOME/insforge/.env" "$BACKUP_DIR/env_$TIMESTAMP.bak"
-
-# Remove backups older than retention period
-find "$BACKUP_DIR" -name "db_*.sql" -mtime +$RETENTION_DAYS -delete
-find "$BACKUP_DIR" -name "env_*.bak" -mtime +$RETENTION_DAYS -delete
-
-echo "[$(date)] Backup completed successfully: db_$TIMESTAMP.sql"
+RETENTION_DAYS=30 ./deploy/backup.sh
 ```
 
+Restaura un volcado de base de datos:
+
 ```bash
-chmod +x ~/insforge/backup.sh
+cd ~/insforge
+set -a && source .env && set +a
+cat backups/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"
 ```
 
 #### 17.2 Programa con Cron
@@ -1035,10 +1022,10 @@ chmod +x ~/insforge/backup.sh
 crontab -e
 ```
 
-Añade esta línea para copias de seguridad diarias a las 3:00 a. m.:
+Añade esta línea para copias de seguridad diarias a las 3:00 a. m. (ajusta la ruta si tu instalación se encuentra en otro lugar):
 
 ```cron
-0 3 * * * /home/deploy/insforge/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1
+0 3 * * * /home/deploy/insforge/deploy/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1
 ```
 
 #### 17.3 Copias de seguridad fuera del sitio (recomendado)
@@ -1117,7 +1104,8 @@ docker stats --no-stream          # Resource usage
 
 # ── Database (source .env first for vars) ────
 source ~/insforge/.env
-docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Backup
+./deploy/backup.sh                                                                              # Backup (db + .env)
+docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Manual backup
 cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"  # Restore
 
 # ── Updates ───────────────────────────────────
