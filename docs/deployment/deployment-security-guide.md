@@ -1011,13 +1011,14 @@ cd ~/insforge
 ./deploy/backup.sh
 ```
 
-By default, backups land in `~/insforge/backups/` and files older than 14 days are removed. Override retention:
+By default, backups land in `~/insforge/backups/` and files older than 14 days are removed. Override retention or the backup directory:
 
 ```bash
 RETENTION_DAYS=30 ./deploy/backup.sh
+BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-Restore a database dump:
+Restore a database dump (adjust path if `BACKUP_DIR` was changed):
 
 ```bash
 cd ~/insforge
@@ -1113,7 +1114,7 @@ docker stats --no-stream          # Resource usage
 
 # ── Database (source .env first for vars) ────
 source ~/insforge/.env
-./deploy/backup.sh                                                                              # Backup (db + .env)
+~/insforge/deploy/backup.sh                                                                     # Backup (db + .env)
 docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Manual backup
 cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"  # Restore
 

@@ -1002,13 +1002,14 @@ cd ~/insforge
 ./deploy/backup.sh
 ```
 
-De forma predeterminada, las copias de seguridad se guardan en `~/insforge/backups/` y se eliminan los archivos con más de 14 días. Sobrescribe la retención:
+De forma predeterminada, las copias de seguridad se guardan en `~/insforge/backups/` y se eliminan los archivos con más de 14 días. Sobrescribe la retención o el directorio de copias de seguridad:
 
 ```bash
 RETENTION_DAYS=30 ./deploy/backup.sh
+BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-Restaura un volcado de base de datos:
+Restaura un volcado de base de datos (ajusta la ruta si se cambió `BACKUP_DIR`):
 
 ```bash
 cd ~/insforge
@@ -1104,7 +1105,7 @@ docker stats --no-stream          # Resource usage
 
 # ── Database (source .env first for vars) ────
 source ~/insforge/.env
-./deploy/backup.sh                                                                              # Backup (db + .env)
+~/insforge/deploy/backup.sh                                                                     # Backup (db + .env)
 docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Manual backup
 cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"  # Restore
 

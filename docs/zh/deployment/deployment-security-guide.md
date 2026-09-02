@@ -999,13 +999,14 @@ cd ~/insforge
 ./deploy/backup.sh
 ```
 
-默认情况下，备份保存在 `~/insforge/backups/` 中，且超过 14 天的文件会被删除。覆盖保留天数：
+默认情况下，备份保存在 `~/insforge/backups/` 中，且超过 14 天的文件会被删除。覆盖保留天数或备份目录：
 
 ```bash
 RETENTION_DAYS=30 ./deploy/backup.sh
+BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-恢复数据库转储：
+恢复数据库转储（如果更改了 `BACKUP_DIR`，请调整路径）：
 
 ```bash
 cd ~/insforge
@@ -1101,7 +1102,7 @@ docker stats --no-stream          # Resource usage
 
 # ── Database (source .env first for vars) ────
 source ~/insforge/.env
-./deploy/backup.sh                                                                              # Backup (db + .env)
+~/insforge/deploy/backup.sh                                                                     # Backup (db + .env)
 docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Manual backup
 cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"  # Restore
 

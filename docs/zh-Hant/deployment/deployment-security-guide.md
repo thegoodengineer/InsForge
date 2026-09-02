@@ -1000,13 +1000,14 @@ cd ~/insforge
 ./deploy/backup.sh
 ```
 
-預設情況下，備份會存放在 `~/insforge/backups/` 中，且超過 14 天的檔案會被刪除。覆寫保留天數：
+預設情況下，備份會存放在 `~/insforge/backups/` 中，且超過 14 天的檔案會被刪除。覆寫保留天數或備份目錄：
 
 ```bash
 RETENTION_DAYS=30 ./deploy/backup.sh
+BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-復原資料庫傾印：
+復原資料庫傾印（若變更了 `BACKUP_DIR`，請調整路徑）：
 
 ```bash
 cd ~/insforge
@@ -1102,7 +1103,7 @@ docker stats --no-stream          # Resource usage
 
 # ── Database (source .env first for vars) ────
 source ~/insforge/.env
-./deploy/backup.sh                                                                              # Backup (db + .env)
+~/insforge/deploy/backup.sh                                                                     # Backup (db + .env)
 docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-insforge}" > backup.sql  # Manual backup
 cat backup.sql | docker compose exec -T postgres psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-insforge}"  # Restore
 
