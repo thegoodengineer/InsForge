@@ -1016,14 +1016,14 @@ cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postg
 
 #### 17.2 使用 Cron 设置计划任务
 
-确保备份目录存在，然后编辑 crontab：
+确保备份目录存在（如果你的安装位置不同，请调整路径），然后编辑 crontab：
 
 ```bash
-mkdir -p ~/insforge/backups
+mkdir -p /home/deploy/insforge/backups
 crontab -e
 ```
 
-添加以下这一行以每天凌晨 3:00 进行备份（如果你的安装位置不同，请调整路径）：
+添加以下这一行以每天凌晨 3:00 进行备份：
 
 ```cron
 0 3 * * * /home/deploy/insforge/deploy/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1

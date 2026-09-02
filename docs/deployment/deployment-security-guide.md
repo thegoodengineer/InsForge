@@ -1028,14 +1028,14 @@ cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postg
 
 #### 17.2 Schedule with Cron
 
-Ensure the backup directory exists, then edit the crontab:
+Ensure the backup directory exists (adjust paths if your install lives elsewhere), then edit the crontab:
 
 ```bash
-mkdir -p ~/insforge/backups
+mkdir -p /home/deploy/insforge/backups
 crontab -e
 ```
 
-Add this line for daily backups at 3:00 AM (adjust the path if your install lives elsewhere):
+Add this line for daily backups at 3:00 AM:
 
 ```cron
 0 3 * * * /home/deploy/insforge/deploy/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1
