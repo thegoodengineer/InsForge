@@ -1009,7 +1009,7 @@ RETENTION_DAYS=30 ./deploy/backup.sh
 BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-Restaura un volcado de base de datos:
+Restaura un volcado de base de datos (si se sobrescribió `BACKUP_DIR`, establécelo aquí o reemplázalo con la ruta de tu copia de seguridad):
 
 ```bash
 cd ~/insforge
@@ -1019,14 +1019,14 @@ cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postg
 
 #### 17.2 Programa con Cron
 
-Asegúrate de que el directorio de copias de seguridad exista (ajusta las rutas si tu instalación se encuentra en otro lugar), luego edita el crontab:
+Asegúrate de que el directorio de copias de seguridad exista (ajusta si la ruta de instalación difiere):
 
 ```bash
 mkdir -p /home/deploy/insforge/backups
 crontab -e
 ```
 
-Añade esta línea para copias de seguridad diarias a las 3:00 a. m.:
+Añade esta línea para copias de seguridad diarias a las 3:00 a. m. (sustituye `/home/deploy/insforge` con tu ruta de instalación real si es diferente):
 
 ```cron
 0 3 * * * /home/deploy/insforge/deploy/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1

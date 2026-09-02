@@ -1018,7 +1018,7 @@ RETENTION_DAYS=30 ./deploy/backup.sh
 BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-Restore a database dump:
+Restore a database dump (if `BACKUP_DIR` was overridden, set it here or replace with your backup path):
 
 ```bash
 cd ~/insforge
@@ -1028,14 +1028,14 @@ cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postg
 
 #### 17.2 Schedule with Cron
 
-Ensure the backup directory exists (adjust paths if your install lives elsewhere), then edit the crontab:
+Ensure the backup directory exists (adjust if your install path differs):
 
 ```bash
 mkdir -p /home/deploy/insforge/backups
 crontab -e
 ```
 
-Add this line for daily backups at 3:00 AM:
+Add this line for daily backups at 3:00 AM (substitute `/home/deploy/insforge` with your actual install path if different):
 
 ```cron
 0 3 * * * /home/deploy/insforge/deploy/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1

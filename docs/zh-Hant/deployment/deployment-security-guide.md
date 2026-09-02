@@ -1007,7 +1007,7 @@ RETENTION_DAYS=30 ./deploy/backup.sh
 BACKUP_DIR=/mnt/backups/insforge ./deploy/backup.sh
 ```
 
-復原資料庫傾印：
+復原資料庫傾印（若覆寫了 `BACKUP_DIR`，請在此處設定或替換為你的備份路徑）：
 
 ```bash
 cd ~/insforge
@@ -1017,14 +1017,14 @@ cat ${BACKUP_DIR:-backups}/db_YYYYMMDD_HHMMSS.sql | docker compose exec -T postg
 
 #### 17.2 使用 Cron 排程
 
-確保備份目錄存在（若你的安裝路徑不同，請調整路徑），然後編輯 crontab：
+確保備份目錄存在（若安裝路徑不同請相應調整）：
 
 ```bash
 mkdir -p /home/deploy/insforge/backups
 crontab -e
 ```
 
-新增以下這一行，讓每天凌晨 3:00 執行備份：
+新增以下這一行，讓每天凌晨 3:00 執行備份（若安裝路徑不同，請將 `/home/deploy/insforge` 替換為你的實際安裝路徑）：
 
 ```cron
 0 3 * * * /home/deploy/insforge/deploy/backup.sh >> /home/deploy/insforge/backups/cron.log 2>&1
